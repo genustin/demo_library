@@ -4,8 +4,9 @@ from __future__ import unicode_literals
 from django.shortcuts import render
 
 # Create your views here.
-from catalog.models import Book, Author, BookInstance, Genre
+from catalog.models import Book, Owner, BookInstance, Genre
 
+# homepage
 def index(request):
     """View function for home page of site."""
 
@@ -13,13 +14,13 @@ def index(request):
     # Generate counts of some of the main objects
     num_books = Book.objects.all().count()
     num_books_word = Book.objects.filter(title__contains='H').count()
-    num_instances = BookInstance.objects.all().count()
     
     # Available books (status = 'a')
+    num_instances = BookInstance.objects.all().count()
     num_instances_available = BookInstance.objects.filter(status__exact='a').count()
     
     # The 'all()' is implied by default.    
-    num_authors = Author.objects.count()
+    num_owners = Owner.objects.count()
     num_genres = Genre.objects.count()
 
     # Number of visits to this view, as counted in the session variable.
@@ -32,7 +33,7 @@ def index(request):
         'num_books_word' : num_books_word,
         'num_instances': num_instances,
         'num_instances_available': num_instances_available,
-        'num_authors': num_authors,
+        'num_owners': num_owners,
         'num_genres' : num_genres, 
         'num_visits': num_visits,
     }
@@ -41,28 +42,24 @@ def index(request):
     return render(request, 'index.html', context=context)
 
 
-
 from django.views import generic
 
 class BookListView(generic.ListView):
-    print "==debug: visit books=="
     model = Book
-    paginate_by = 7
+    paginate_by = 10
 
 class BookDetailView(generic.DetailView):
-    print "==debug: visit book details=="
     model = Book
 
-class AuthorListView(generic.ListView):
-    print "==debug: visit authors=="
-    model = Author
-    paginate_by = 7
+class OwnerListView(generic.ListView):
+    model = Owner
+    paginate_by = 10
 
-class AuthorDetailView(generic.DetailView):
-    print "==debug: visit author details=="
-    model = Author
+class OwnerDetailView(generic.DetailView):
+    model = Owner
 
 
+# check loan book instance 
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 class LoanedBooksByUserListView(LoginRequiredMixin, generic.ListView):
@@ -83,7 +80,6 @@ class LoanedBooksListView(LoginRequiredMixin, generic.ListView):
 
     def get_queryset(self):
         return BookInstance.objects.filter(status__exact='o').order_by('due_back')
-
 
 import datetime
 
@@ -131,10 +127,46 @@ def renew_book_librarian(request, pk):
 
     return render(request, 'catalog/book_renew_librarian.html', context)
 
+# 
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
+class BookCreate(CreateView):
+    model = Book
+    fields = '__all__'
 
-from catalog.models import Author, Book
+class BookUpdate(UpdateView):
+    model = Book
+    fields = ['title', 'owner', 'summary', 'isbn', 'genre']
+
+class BookDelete(DeleteView):
+    model = Book
+    success_url = reverse_lazy('books')
+
+class BookInstCreate(CreateView):
+    model = BookInstance
+    fields = '__all__'
+    success_url = reverse_lazy('books')
+
+class OwnerCreate(CreateView):
+    model = Owner
+    fields = '__all__'
+
+class OwnerUpdate(UpdateView):
+    model = Owner
+    fields = ['name', 'date_of_join']
+
+class OwnerDelete(DeleteView):
+    model = Owner
+    success_url = reverse_lazy('owners')
+
+# author is not important yet
+from catalog.models import Author
+class AuthorListView(generic.ListView):
+    model = Author
+    paginate_by = 10
+
+class AuthorDetailView(generic.DetailView):
+    model = Author
 
 class AuthorCreate(CreateView):
     model = Author
@@ -148,15 +180,3 @@ class AuthorUpdate(UpdateView):
 class AuthorDelete(DeleteView):
     model = Author
     success_url = reverse_lazy('authors')
-
-class BookCreate(CreateView):
-    model = Book
-    fields = '__all__'
-
-class BookUpdate(UpdateView):
-    model = Book
-    fields = ['title', 'author', 'summary', 'isbn', 'genre']
-
-class BookDelete(DeleteView):
-    model = Book
-    success_url = reverse_lazy('books')

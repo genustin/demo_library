@@ -6,8 +6,6 @@ from datetime import date
 from django.contrib.auth.models import User
 
 # Create your models here.
-
-
 class Genre(models.Model):
     """Model representing a book genre."""
     name = models.CharField(
@@ -21,15 +19,13 @@ class Genre(models.Model):
 # Used to generate URLs by reversing the URL patterns
 from django.urls import reverse
 
-
 class Book(models.Model):
     """Model representing a book (but not a specific copy of a book)."""
     title = models.CharField(max_length=200)
-    owner = models.CharField(max_length=20)
-    author = models.ForeignKey('Author', on_delete=models.SET_NULL, null=True)
 
-    # Foreign Key used because book can only have one author, but authors can have multiple books
-    # Author as a string rather than object because it hasn't been declared yet in the file.
+    # Foreign Key used because book can only have one owner, but owner can have multiple books
+    # Owner as a string rather than object because it hasn't been declared yet in the file.
+    owner = models.ForeignKey('Owner', on_delete=models.SET_NULL, null=True)
     summary = models.TextField(
         max_length=1000, help_text='Enter a brief description of the book')
     isbn = models.CharField(
@@ -56,8 +52,6 @@ class Book(models.Model):
 
 
 import uuid  # Required for unique book instances
-
-
 class BookInstance(models.Model):
     """Model representing a specific copy of a book (i.e. that can be borrowed from the library)."""
     id = models.UUIDField(primary_key=True, default=uuid.uuid4,
@@ -98,7 +92,23 @@ class BookInstance(models.Model):
         """String for representing the Model object."""
         return '{0} ({1})'.format(self.id, self.book.title)
 
+class Owner(models.Model):
+    """Model representing the owner of the book."""
+    name = models.CharField(max_length=100)
 
+    class Meta:
+        ordering = ['name']
+
+    def get_absolute_url(self):
+        """Returns the url to access a particular owner instance."""
+        return reverse('owner_detail', args=[str(self.id)])
+
+    def __str__(self):
+        """String for representing the Model object."""
+        return '{0}'.format(self.name)
+
+
+# author is not important in daily usage, just put it here
 class Author(models.Model):
     """Model representing an author."""
     first_name = models.CharField(max_length=100)

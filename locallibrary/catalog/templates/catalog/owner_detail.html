@@ -1,20 +1,18 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
-  <h1>Title: {{ author }}</h1>
-  <p>{{ author.period }}</p>
-
+  <h1>{{ owner }}</h1>
   <p>
-      <a href="{% url 'author_update' author.id %}">update the author</a>
+      <a href="{% url 'owner_update' owner.id %}">update the owner</a>
       {% if perms.catalog.can_mark_returned %}
-      | <a href="{% url 'author_delete' author.id %}">delete</a> 
+      | <a href="{% url 'owner_delete' owner.id %}">delete</a> 
       {% endif %}
   </p>
 
   <div style="margin-left:20px;margin-top:20px">
       <h4>Books</h4>
       <hr>
-      {% for book in author.book_set.all %}
+      {% for book in owner.book_set.all %}
         <p><strong><a href="{% url 'book-detail' book.pk %}">{{ book.title }}</a> ({{ book.bookinstance_set.count }})</strong></p>
         <p>{{ book.summary }}</p>
         <hr>
