@@ -11,7 +11,7 @@
   <p><strong>Genre:</strong> {% for genre in book.genre.all %} {{ genre }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>  
 
   <p>
-  <a href="{% url 'book_update' book.id %}">update the book</a> | 
+  <a href="{% url 'book_update' book.id %}">update the book</a>
   {% if perms.catalog.can_mark_returned %}
   | <a href="{% url 'book_delete' book.id %}">delete</a> 
   {% endif %}

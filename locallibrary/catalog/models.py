@@ -86,7 +86,7 @@ class BookInstance(models.Model):
 
     class Meta:
         ordering = ['due_back']
-        permissions = (("can_mark_returned", "Set book as returned"),) 
+        permissions = (("can_mark_returned", "Set book as returned"),)
 
     @property
     def is_overdue(self):
@@ -115,7 +115,10 @@ class Author(models.Model):
 
     def period(self):
         """String about the birth and death"""
-        birth = self.date_of_birth.strftime("%b. %d, %Y")
+        if self.date_of_birth == None:
+            birth = ""
+        else:
+            birth = self.date_of_birth.strftime("%b. %d, %Y")
         if self.date_of_death == None:
             death = ""
         else:
