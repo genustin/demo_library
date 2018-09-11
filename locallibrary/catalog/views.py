@@ -147,6 +147,11 @@ class BookInstCreate(CreateView):
     fields = '__all__'
     success_url = reverse_lazy('books')
 
+class BookInstUpdate(UpdateView):
+    model = BookInstance
+    fields = ['status', 'borrower', 'due_back']
+    success_url = reverse_lazy('my-borrowed')
+
 class OwnerCreate(CreateView):
     model = Owner
     fields = '__all__'

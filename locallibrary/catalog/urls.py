@@ -22,6 +22,7 @@ urlpatterns += [
 # book instance manage
 urlpatterns += [
     url(r'^bookinst/create/', views.BookInstCreate.as_view(), name='bookinst_create'),
+    url(r'^bookinst/(?P<pk>\w{8}(-\w{4}){3}-\w{12}?)/update/', views.BookInstUpdate.as_view(), name='bookinst_update'),
     url(r'^bookinst/(?P<pk>\w{8}(-\w{4}){3}-\w{12}?)/renew/', views.renew_book_librarian, name='renew-book-librarian'),
 ]
 
